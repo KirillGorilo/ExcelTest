@@ -134,6 +134,11 @@ namespace withdrawingDataExcel
             int[] indexWeek = new int[7];
             for (int i = 0; i < week.Length; i++)
             {
+                if (i == 6)
+                {
+                    indexWeek[6] = indexWeek[5] + 5;
+                    break;
+                }
                 int j = 0;
 
                 string index = returnIndex(week[i]);
@@ -143,7 +148,6 @@ namespace withdrawingDataExcel
                 bool isNumeric = int.TryParse(index, out j);
                 indexWeek[i] = j;
             }
-
             return indexWeek;
         }
 
@@ -154,21 +158,6 @@ namespace withdrawingDataExcel
 
             string indexGroup = returnIndex(nameGroup);
 
-            //задаёт последний индекс субботы
-            
-
-            //for (int i = 0; i < indexWeek.Length; i++)
-            //{
-            //    int index = 1;
-            //    for (int j = indexWeek[i]; j < indexWeek[index]; j++)
-            //    {
-            //        Console.WriteLine(j);
-            //        index++;
-            //    }
-            //}
-
-            int index = 1;
-
             // Получить количество строк и столбцов
             int cols = findStrings(nameGroup)[1];
 
@@ -177,34 +166,19 @@ namespace withdrawingDataExcel
             // Получить рабочий лист, используя его индекс
             Worksheet worksheet = collection[numberSheets];
 
-            for (int i = findIndexWeek()[0]-1; i < findIndexWeek()[1]-1; i++)
+            int n = 1;
+            for (int j = 0; j < findIndexWeek().Length - 1; j++)
             {
-
-                    string stringForList = (string)worksheet.Cells[i, cols].Value;
+                for (int i = findIndexWeek()[j]; i < findIndexWeek()[n]; i++)
+                {
+                    string stringForList = (string)worksheet.Cells[i-1, cols].Value;
                     List<string> stringsList = new List<string>();
 
-                    Console.WriteLine(stringForList);
+                    Console.WriteLine(j + stringForList );
+                
+                }
+                n++;
             }
-
-            //for (int i = 0; i < indexWeek.Length - 1; i++)
-            //{
-            //    while (indexWeek[i] < indexWeek[index])
-            //    {
-            //        for (int i = 0; i < rows; i++)
-            //        {
-
-            //            // Перебрать каждый столбец в выбранной строке
-            //            for (int j = 0; j < cols; j++)
-            //            {
-
-            //                string stringForList = (string)worksheet.Cells[i, j].Value;
-            //                List<string> stringsList = new List<string>();
-
-            //            }
-            //        }
-            //    }
-            //    index++;
-            //}
 
             Console.WriteLine(nameGroup);
             return test;
