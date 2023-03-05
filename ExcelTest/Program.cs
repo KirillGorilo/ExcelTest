@@ -22,8 +22,25 @@ namespace withdrawingDataExcel
             this.path = path;
             this.numberSheets = numberSheets;
             this.nameGroup = nameGroup;
+
             wb = new Workbook(path);
+
+
+            testingGroup(nameGroup);
+
         }
+
+        #region Обработка исключения 
+        void testingGroup(string nameGroup)
+        {
+            if (findStrings(nameGroup.ToLower()).Length == 1)
+            {
+                Console.WriteLine("Нет такой группы!!!");
+                Environment.Exit(1);
+            }
+        }
+
+        #endregion
 
         //метод возвращающий список листов
         public List<string> sheetsList()
@@ -57,9 +74,17 @@ namespace withdrawingDataExcel
         //поиск по колонке и строке, принимает массив в виде столбца и строки. Возвращает индекс формата A0
         public string findRowAndColumn(int[] rowcol)
         {
+            string name;
+            try
+            {
+                name = Aspose.Cells.CellsHelper.CellIndexToName(rowcol[0], rowcol[1]);
 
-            string name = Aspose.Cells.CellsHelper.CellIndexToName(rowcol[0], rowcol[1]);
-
+            }
+            catch (IndexOutOfRangeException)
+            {
+                
+                return "A0";
+            }
             return name;
         }
 
