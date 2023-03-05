@@ -1,6 +1,5 @@
 ﻿using Aspose.Cells;
 using Aspose.Cells.Properties;
-using OfficeOpenXml.ConditionalFormatting;
 using Workbook = Aspose.Cells.Workbook;
 using System.Text.RegularExpressions;
 
@@ -39,7 +38,7 @@ namespace withdrawingDataExcel
         }
 
         //поиск по индексу, принимает индекс формата A0, возвращает ряд и колонку
-        public string findIndex(string nameIndex)
+        public int[] findIndex(string nameIndex)
         {
             WorksheetCollection collection = wb.Worksheets;
             Worksheet worksheet = collection[numberSheets];
@@ -50,7 +49,9 @@ namespace withdrawingDataExcel
             Aspose.Cells.CellsHelper.CellNameToIndex(nameIndex, out row, out column);
 
             string indexValue = Aspose.Cells.CellsHelper.CellIndexToName(row, column);
-            return (string)worksheet.Cells[indexValue].Value + $" row: {row}, column: {column}";
+
+            int[] rowsColumns = new int[2] { row, column };
+            return rowsColumns;
         }
 
         //поиск по колонке и строке, принимает массив в виде столбца и строки. Возвращает индекс формата A0
@@ -120,13 +121,13 @@ namespace withdrawingDataExcel
         }
 
         //метод принимает строковое значение и возврщает данные формата A0
-        public int[] returnIndex(string findString)
+        public string returnIndex(string findString)
         {
-            return findStrings(findString);
+            return findRowAndColumn(findStrings(findString));
         }
 
         //поиск индекса дня недели, возвращает массив из индексов начала недели 
-        public int[] findIndexWeek()
+        private int[] findIndexWeek()
         {
             string[] week = new string[7] { "ПНД", "ВТР", "СРД", "ЧТВ", "ПТН", "СБТ", "СБТ"};
 
@@ -135,7 +136,7 @@ namespace withdrawingDataExcel
             {
                 int j = 0;
 
-                string index = findRowAndColumn(findStrings(week[i]));
+                string index = returnIndex(week[i]);
 
                 index = Regex.Match(index, @"\d+").Value;
 
@@ -147,16 +148,14 @@ namespace withdrawingDataExcel
         }
 
         //метод принимает массив индексов дней недели. Возвращает список пар 
-        public List<string> returnListPair(int[] indexWeek)
+        public List<string> returnListPair()
         {
-            int[] column = new int[0];
-            //column = 
             List<string> test = new List<string>();
 
-            string indexGroup = findRowAndColumn(findStrings(nameGroup));
+            string indexGroup = returnIndex(nameGroup);
 
             //задаёт последний индекс субботы
-            indexWeek[7] = 38;
+            
 
             //for (int i = 0; i < indexWeek.Length; i++)
             //{
@@ -170,13 +169,42 @@ namespace withdrawingDataExcel
 
             int index = 1;
 
-            for (int i = 0; i < indexWeek.Length - 1; i++)
+            // Получить количество строк и столбцов
+            int cols = findStrings(nameGroup)[1];
+
+            WorksheetCollection collection = wb.Worksheets;
+
+            // Получить рабочий лист, используя его индекс
+            Worksheet worksheet = collection[numberSheets];
+
+            for (int i = findIndexWeek()[0]-1; i < findIndexWeek()[1]-1; i++)
             {
-                while (indexWeek[i] < indexWeek[index])
-                {
-                    Console.WriteLine();
-                }
+
+                    string stringForList = (string)worksheet.Cells[i, cols].Value;
+                    List<string> stringsList = new List<string>();
+
+                    Console.WriteLine(stringForList);
             }
+
+            //for (int i = 0; i < indexWeek.Length - 1; i++)
+            //{
+            //    while (indexWeek[i] < indexWeek[index])
+            //    {
+            //        for (int i = 0; i < rows; i++)
+            //        {
+
+            //            // Перебрать каждый столбец в выбранной строке
+            //            for (int j = 0; j < cols; j++)
+            //            {
+
+            //                string stringForList = (string)worksheet.Cells[i, j].Value;
+            //                List<string> stringsList = new List<string>();
+
+            //            }
+            //        }
+            //    }
+            //    index++;
+            //}
 
             Console.WriteLine(nameGroup);
             return test;
