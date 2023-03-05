@@ -15,10 +15,6 @@ namespace ExcelTest
         {
             Program pr = new Program("C:\\Users\\kirill\\Downloads\\расписание с 6.03.xlsx", 3, "ИП31");
             List<string> strings = pr.sheetsList();
-            //foreach (var item in strings)
-            //{
-            //    Console.WriteLine(item);
-            //} 
             //Console.WriteLine(pr.findStrings("ВТР"));
 
 
