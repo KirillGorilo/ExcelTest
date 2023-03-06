@@ -16,6 +16,17 @@ namespace withdrawingDataExcel
         //название группы 
         public string nameGroup { get; set; }
 
+        //словарь который хрванит массивы со значениями 
+        public Dictionary<int, List<string>> infoWeek = 
+            new Dictionary<int, List<string>>()
+        {
+            {1, new List<string>() },
+            {2, new List<string>() },
+            {3, new List<string>() },
+            {4, new List<string>() },
+            {5, new List<string>() },
+            {6, new List<string>() },
+        };
 
         public Program(string path, int numberSheets, string nameGroup)
         {
@@ -26,8 +37,9 @@ namespace withdrawingDataExcel
             wb = new Workbook(path);
 
 
+            testingCourse(numberSheets);
             testingGroup(nameGroup);
-
+            returnListPair();
         }
 
         #region Обработка исключения 
@@ -38,6 +50,19 @@ namespace withdrawingDataExcel
                 Console.WriteLine("Нет такой группы!!!");
                 Environment.Exit(1);
             }
+        }
+
+        void testingCourse(int nameSheets)
+        {
+            for (int i = 0; i < sheetsList().Count; i++)
+            {
+                if (i == nameSheets)
+                {
+                    break;
+                }
+            }
+            Console.WriteLine("Не найден такой курс!!!");
+            Environment.Exit(1);
         }
 
         #endregion
@@ -82,7 +107,7 @@ namespace withdrawingDataExcel
             }
             catch (IndexOutOfRangeException)
             {
-                
+
                 return "A0";
             }
             return name;
@@ -140,7 +165,7 @@ namespace withdrawingDataExcel
                 return new int[] { Convert.ToInt32(row), Convert.ToInt32(column) };
             }
             else
-            { 
+            {
                 return new int[] { 0 };
             }
         }
@@ -154,7 +179,7 @@ namespace withdrawingDataExcel
         //поиск индекса дня недели, возвращает массив из индексов начала недели 
         private int[] findIndexWeek()
         {
-            string[] week = new string[7] { "ПНД", "ВТР", "СРД", "ЧТВ", "ПТН", "СБТ", "СБТ"};
+            string[] week = new string[7] { "ПНД", "ВТР", "СРД", "ЧТВ", "ПТН", "СБТ", "СБТ" };
 
             int[] indexWeek = new int[7];
             for (int i = 0; i < week.Length; i++)
@@ -177,12 +202,8 @@ namespace withdrawingDataExcel
         }
 
         //метод принимает массив индексов дней недели. Возвращает список пар 
-        public List<string> returnListPair()
+        private void returnListPair()
         {
-            List<string> test = new List<string>();
-
-            string indexGroup = returnIndex(nameGroup);
-
             // Получить количество строк и столбцов
             int cols = findStrings(nameGroup)[1];
 
@@ -192,21 +213,39 @@ namespace withdrawingDataExcel
             Worksheet worksheet = collection[numberSheets];
 
             int n = 1;
+
+            int indexPair = 1;
             for (int j = 0; j < findIndexWeek().Length - 1; j++)
             {
                 for (int i = findIndexWeek()[j]; i < findIndexWeek()[n]; i++)
                 {
-                    string stringForList = (string)worksheet.Cells[i-1, cols].Value;
-                    List<string> stringsList = new List<string>();
+                    string stringForList = (string)worksheet.Cells[i - 1, cols].Value;
+                    string teacher = (string)worksheet.Cells[i - 1, cols + 1].Value;
+                    string cabinet = (string)worksheet.Cells[i - 1, cols + 2].Value;
+                    string dataTime = (string)worksheet.Cells[i - 1, findStrings("часы")[1]].Value;
 
-                    Console.WriteLine(j + stringForList );
-                
+                    string all = $"{stringForList} {teacher} {cabinet}".Trim(' ');
+                    all = all.Insert(0, indexPair.ToString() + ". ");
+
+                    if (dataTime != null && stringForList != null)
+                    {
+                        if (stringForList.Replace(" ", "") != "")
+                        {
+                            all = all.Insert(3, dataTime.ToString());
+                        }
+
+                    }
+                    if (all.Length < 13)
+                    {
+                        all += "Нет пары";
+                    }
+
+                    infoWeek[n].Add(all);
+                    indexPair++;
                 }
+                indexPair = 1;
                 n++;
             }
-
-            Console.WriteLine(nameGroup);
-            return test;
         }
     }
 }
