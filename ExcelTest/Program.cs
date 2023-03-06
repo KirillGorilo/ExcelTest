@@ -54,15 +54,20 @@ namespace withdrawingDataExcel
 
         void testingCourse(int nameSheets)
         {
+            bool flag = true;
             for (int i = 0; i < sheetsList().Count; i++)
             {
                 if (i == nameSheets)
                 {
+                    flag = false;   
                     break;
                 }
             }
-            Console.WriteLine("Не найден такой курс!!!");
-            Environment.Exit(1);
+            if (flag)
+            {
+                Console.WriteLine("Не найден такой курс!!!");
+                Environment.Exit(1);
+            }
         }
 
         #endregion
